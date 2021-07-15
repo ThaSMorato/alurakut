@@ -1,6 +1,6 @@
 import MainGrid from '../src/components/MainGrid';
 import Box from '../src/components/Box';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
 import { AlurakutMenu, OrkutNostalgicIconSet, AlurakutProfileSidebarMenuDefault } from '../src/components/lib/AlurakutCommons'
 
@@ -18,6 +18,30 @@ const ProfileSidebar = ({user}) => {
   )
 }
 
+const ProfileRelationsBox = ({ title, itens }) => {
+  return (
+    <ProfileRelationsBoxWrapper className="profileRelationsArea">
+          <h2 className="smallTitle">
+            { title } ({itens.length})
+          </h2>
+          <ul>
+            {
+              itens.slice(0,6).map((follower) => {
+                return (
+                  <li key={follower.id}>
+                    <a href={follower.url}>  
+                      <img src={follower.avatar_url} />
+                      <span>{follower.login}</span>
+                    </a>
+                  </li>
+                )
+              })
+            }
+          </ul>
+        </ProfileRelationsBoxWrapper>
+  )
+}
+
 export default function Home() {
 
   const handleCommunityCreate = (e) => {
@@ -32,25 +56,36 @@ export default function Home() {
   }
 
   const createCommunity = (name,url) => {
-    setCommunity([...comunity, {id: new Date().toISOString(), name, url}])
+    const id = new Date().toISOString();
+    setCommunity([...comunity, {id, login: name, avatar_url: url, url : `/comunity/${id}`}])
   }
 
   const gitHubUser = "ThaSMorato";
 
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
+
+  useEffect(async () => {
+    const followersResponse = await fetch(`https://api.github.com/users/${gitHubUser}/followers`);
+    const followersJson = await followersResponse.json();
+    console.log(followersJson);
+    setFollowers(followersJson);
+  }, [])
+
+  useEffect(async () => {
+    const followingResponse = await fetch(`https://api.github.com/users/${gitHubUser}/following`);
+    const followingJson = await followingResponse.json();
+    console.log(followingJson);
+    setFollowing(followingJson);
+  }, [])
+
   const [comunity, setCommunity] = useState([{
     id: new Date().toISOString(),
-    name: "Eu Odeio Acordar Cedo",
-    url: "https://alurakut.vercel.app/capa-comunidade-01.jpg"
+    login: "Eu Odeio Acordar Cedo",
+    avatar_url: "https://alurakut.vercel.app/capa-comunidade-01.jpg",
+    url: "/comunitty/Eu Odeio Acordar Cedo"
   }]);
 
-  const pessoasFavoritas = [
-    'juunegreiros',
-    'peas',
-    'omariosouto',
-    'rafaballerini',
-    'marcobrunodev',
-    'felipefialho'
-  ];
 
   return (
     <>
@@ -93,44 +128,9 @@ export default function Home() {
         </Box>
       </div>
       <div style={{ gridArea: "profileRelationsArea"}}>
-        <ProfileRelationsBoxWrapper className="profileRelationsArea">
-          <h2 className="smallTitle">
-            Pessoas da Comunidade ({pessoasFavoritas.length})
-          </h2>
-          <ul>
-            {
-              pessoasFavoritas.slice(0,6).map((pessoa) => {
-                return (
-                  <li key={pessoa}>
-                    <a href={`/users/${pessoa}`}>  
-                      <img src={`https://github.com/${pessoa}.png`} />
-                      <span>{pessoa}</span>
-                    </a>
-                  </li>
-                )
-              })
-            }
-          </ul>
-        </ProfileRelationsBoxWrapper>
-        <ProfileRelationsBoxWrapper className="profileRelationsArea">
-          <h2 className="smallTitle">
-            Minhas Comunidades ({comunity.length})
-          </h2>
-          <ul>
-            {
-              comunity.slice(0,6).map((comunity) => {
-                return (
-                  <li key={comunity.id}>
-                    <a href={`/users/${comunity.name}`}>  
-                      <img src={comunity.url} />
-                      <span>{comunity.name}</span>
-                    </a>
-                  </li>
-                )
-              })
-            }
-          </ul>
-        </ProfileRelationsBoxWrapper>
+        <ProfileRelationsBox title="Meus Seguidores" itens={followers} />
+        <ProfileRelationsBox title="Quem eu Sigo" itens={following} />
+        <ProfileRelationsBox title="Minhas Comunidades" itens={comunity} />
       </div>
     </MainGrid>
     </>
