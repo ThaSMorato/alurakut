@@ -2,7 +2,9 @@ import MainGrid from '../src/components/MainGrid';
 import Box from '../src/components/Box';
 import { useState, useEffect } from 'react';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
-import { AlurakutMenu, OrkutNostalgicIconSet, AlurakutProfileSidebarMenuDefault } from '../src/components/lib/AlurakutCommons'
+import { AlurakutMenu, OrkutNostalgicIconSet, AlurakutProfileSidebarMenuDefault } from '../src/components/lib/AlurakutCommons';
+import nookies from 'nookies';
+import jwt from 'jsonwebtoken';
 
 const ProfileSidebar = ({user}) => {
   return (
@@ -42,8 +44,54 @@ const ProfileRelationsBox = ({ title, itens }) => {
   )
 }
 
-export default function Home() {
+export default function Home({githubUser}) {
 
+  const gitHubUser = githubUser;
+
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
+
+  const [comunity, setCommunity] = useState([]);
+
+  useEffect(async () => {
+    const followersResponse = await fetch(`https://api.github.com/users/${gitHubUser}/followers`);
+    const followersJson = await followersResponse.json();
+    setFollowers(followersJson);
+  }, [])
+
+  useEffect(async () => {
+    const followingResponse = await fetch(`https://api.github.com/users/${gitHubUser}/following`);
+    const followingJson = await followingResponse.json();
+    setFollowing(followingJson);
+  }, [])
+
+  useEffect(async () => {
+    const comunityResponse = await fetch("https://graphql.datocms.com/", { 
+      method: 'POST',
+      headers: {
+        'Authorization' : 'af23ab952f3c303eace91943a6eb2a',
+        'Content-type' : 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({query: `query {
+          allCommunities(
+            filter: {
+              creatorSlug: { eq: "${gitHubUser.toLocaleLowerCase()}"}
+            }
+          ) {
+            id,
+            creatorSlug,
+            imageUrl,
+            title
+          }
+        }`
+      })
+    });
+    const comunityJson = await comunityResponse.json();
+    handleCommunity(comunityJson.data.allCommunities)
+  }, [])
+
+  
   const handleCommunityCreate = (e) => {
     e.preventDefault();
 
@@ -55,37 +103,34 @@ export default function Home() {
     }
   }
 
-  const createCommunity = (name,url) => {
-    const id = new Date().toISOString();
-    setCommunity([...comunity, {id, login: name, avatar_url: url, url : `/comunity/${id}`}])
+  const createCommunity = async (name,url) => {
+    const newComunityResponse = await fetch('/api/comunidades',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({title: name, imageUrl: url, creatorSlug: gitHubUser})
+    })
+    const newComunityJson = await newComunityResponse.json();
+    const formatedCommunity = formatComunity(newComunityJson.newRegister);
+    setCommunity([...comunity, formatedCommunity])
   }
 
-  const gitHubUser = "ThaSMorato";
+  const handleCommunity = (communityArray) => {
+    const formatedComunity = communityArray.map((community) => {
+      return formatComunity(community)
+    })
+    setCommunity(formatedComunity);
+  }
 
-  const [followers, setFollowers] = useState([]);
-  const [following, setFollowing] = useState([]);
-
-  useEffect(async () => {
-    const followersResponse = await fetch(`https://api.github.com/users/${gitHubUser}/followers`);
-    const followersJson = await followersResponse.json();
-    console.log(followersJson);
-    setFollowers(followersJson);
-  }, [])
-
-  useEffect(async () => {
-    const followingResponse = await fetch(`https://api.github.com/users/${gitHubUser}/following`);
-    const followingJson = await followingResponse.json();
-    console.log(followingJson);
-    setFollowing(followingJson);
-  }, [])
-
-  const [comunity, setCommunity] = useState([{
-    id: new Date().toISOString(),
-    login: "Eu Odeio Acordar Cedo",
-    avatar_url: "https://alurakut.vercel.app/capa-comunidade-01.jpg",
-    url: "/comunitty/Eu Odeio Acordar Cedo"
-  }]);
-
+  const formatComunity = (community) => {
+    return {
+      id: community.id,
+      login: community.title,
+      avatar_url: community.imageUrl,
+      url : `/comunity/${community.id}`
+    }
+  }
 
   return (
     <>
@@ -135,4 +180,37 @@ export default function Home() {
     </MainGrid>
     </>
   )
+}
+
+export async function getServerSideProps(context) {
+
+  const cookies = nookies.get(context)
+  const token = cookies.USER_TOKEN;
+  
+  const option =  {
+    headers: {
+        Authorization: token
+    },
+  };
+
+  const ret = await fetch("https://alurakut.vercel.app/api/auth", option);
+
+  const { isAuthenticated } = await ret.json();
+
+  if(!isAuthenticated) {
+    return { 
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      }
+    }
+  }
+
+  const { githubUser } = jwt.decode(token);
+
+  return {
+    props: {
+      githubUser,
+    }
+  }
 }
