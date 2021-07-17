@@ -1,8 +1,8 @@
-import MainGrid from '../src/components/MainGrid';
-import Box from '../src/components/Box';
+import MainGrid from '../components/MainGrid';
+import Box from '../components/Box';
 import { useState, useEffect } from 'react';
-import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
-import { AlurakutMenu, OrkutNostalgicIconSet, AlurakutProfileSidebarMenuDefault } from '../src/components/lib/AlurakutCommons';
+import { ProfileRelationsBoxWrapper } from '../components/ProfileRelations';
+import { AlurakutMenu, OrkutNostalgicIconSet, AlurakutProfileSidebarMenuDefault } from '../components/lib/AlurakutCommons';
 import nookies from 'nookies';
 import jwt from 'jsonwebtoken';
 
