@@ -54,7 +54,7 @@ export function AlurakutMenu({ githubUser }) {
 }
 AlurakutMenu.Wrapper = styled.header`
   width: 100%;
-  background-color: #308BC5;
+  background-color: #453e61;
   .alurakutMenuProfileSidebar {
     background: white;
     position: fixed;
@@ -93,7 +93,7 @@ AlurakutMenu.Wrapper = styled.header`
     }
   }
   .container {
-    background-color: #308BC5;
+    background-color: #453e61;
     padding: 7px 16px;
     max-width: 1110px;
     margin: auto;
@@ -126,7 +126,7 @@ AlurakutMenu.Wrapper = styled.header`
         text-decoration: none;
         &:after {
           content: " ";
-          background-color: #5292C1;
+          background-color: #61eb14;
           display: block;
           position: absolute;
           width: 1px;
@@ -140,7 +140,7 @@ AlurakutMenu.Wrapper = styled.header`
     }
     input {
       color: #ffffff;
-      background: #5579A1;
+      background: #835094;
       padding: 10px 42px;
       border: 0;
       background-image: url(${`${BASE_URL}/icons/search.svg`});
@@ -320,16 +320,16 @@ OrkutNostalgicIconSet.List = styled.ul`
 // ================================================================================================================
 const AlurakutLoginScreen = css`
   :root {
-    --backgroundPrimary: #D9E6F6;
-    --backgroundSecondary: #F1F9FE;
-    --backgroundTertiary: #FFFFFF;
-    --backgroundQuarternary: #BBCDE8;
-    --colorPrimary: #2E7BB4;
-    --colorSecondary: #388BB0;
-    --colorTertiary: #2F4A71;
-    --colorQuarternary: #D81D99;
+    --backgroundPrimary: #874170;
+    --backgroundSecondary: #453e61;
+    --backgroundTertiary: #f5d6d6;
+    --backgroundQuarternary: #835094;
+    --colorPrimary: #efe84f;
+    --colorSecondary: #61eb14;
+    --colorTertiary: #a030c7;
+    --colorQuarternary: #6806a1;
     --textPrimaryColor: #333333;
-    --textSecondaryColor: #FFFFFF;
+    --textSecondaryColor: #a030c7;
     --textTertiaryColor: #5A5A5A;
     --textQuarternaryColor: #C5C6CA;
     --commonRadius: 8px;
@@ -464,11 +464,11 @@ export const AlurakutStyles = css`
     background: #f1f1f1; 
   }
   *::-webkit-scrollbar-thumb {
-    background: #888; 
+    background: #835094; 
     border-radius: 10px;
   }
   *::-webkit-scrollbar-thumb:hover {
-    background: #555; 
+    background: #6806a1; 
   }
   a,
   button {

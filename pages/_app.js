@@ -9,7 +9,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    background-color: #d9e6f6;
+    background-color: #874170;
     font-family: sans-serif;
   }
 
@@ -30,7 +30,7 @@ const GlobalStyle = createGlobalStyle`
 
 const theme = {
   colors: {
-    primary: '#0070f3',
+    primary: '#a030c7',
   },
 }
 
